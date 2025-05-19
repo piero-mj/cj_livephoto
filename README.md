@@ -54,10 +54,16 @@
 ##前端展示
 ###相册管理（管理员）
 <img width="1572" alt="image" src="https://github.com/user-attachments/assets/49518b0a-6903-4f1f-9bf7-a1470bfadf4c" />
+
+
 ### 相册照片管理（管理员）
 <img width="1449" alt="image" src="https://github.com/user-attachments/assets/fbbc2ffc-1a18-466d-94f9-bf8de050163a" />
+
+
 ### 查看相册（用户）
 <img width="637" alt="image" src="https://github.com/user-attachments/assets/4cd880f8-5628-4041-8105-8825710dd730" />
+
+
 ### 管理台（spuperadmin）
 <img width="1706" alt="image" src="https://github.com/user-attachments/assets/68a4f00d-1e8b-4827-89d9-9832d30a6027" />
 
