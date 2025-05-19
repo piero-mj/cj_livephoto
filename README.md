@@ -1,4 +1,4 @@
-<img width="1620" alt="image" src="https://github.com/user-attachments/assets/b867d28e-a51d-49ed-9a1d-f9047d58a4c7" /># CJ Live Photo Gallery
+# CJ Live Photo Gallery
 
 一个基于 Django 的照片直播系统，支持相册管理、照片上传和展示功能。
 
@@ -51,8 +51,9 @@
 - 访问记录审计
 
 
-##前端展示
-###相册管理（管理员）
+## 前端展示
+
+### 相册管理（管理员）
 <img width="1572" alt="image" src="https://github.com/user-attachments/assets/49518b0a-6903-4f1f-9bf7-a1470bfadf4c" />
 
 
