@@ -1,0 +1,75 @@
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+
+# Django Database
+*.sqlite3
+db.sqlite3
+
+# Django Static/Media
+staticfiles/
+media/
+static/
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+*.swp
+*.DS_Store
+logs/
+tmp/
+
+# Testing and coverage
+.coverage
+htmlcov/
+coverage.xml
+.pytest_cache/
+.tox/
+coverage/
+
+# Node modules
+node_modules/
+
+# Large binary files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.pdf
+*.mp4
+*.mov
+*.avi
+*.mp3
+*.wav
+*.flac
+
+# Generated files
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dylib
+*.dll
+
+# IDE specific
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db 

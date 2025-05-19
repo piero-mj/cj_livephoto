@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ gallery.name }}{% endblock %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js" rel="stylesheet">
+<style>
+    .cover-container, .photo-main-container {
+        max-width: 600px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    .gallery-header {
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        background: url('{{ gallery.cover_photo.original.url }}') center/cover no-repeat;
+        min-height: 220px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 2.5rem 1.2rem 2rem 1.2rem;
+        margin-bottom: 2rem;
+    }
+    .cover-info {
+        /* background: rgba(0,0,0,0.35); */
+        border-radius: 12px;
+        padding: 1.2rem 1rem;
+        width: 100%;
+        text-align: center;
+    }
+    .gallery-title, .gallery-description, .gallery-date {
+        color: #fff;
+        margin: 0.2em 0;
+    }
+    .gallery-title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+    .gallery-description {
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+    .gallery-date {
+        font-size: 1rem;
+        opacity: 0.85;
+    }
+    .gallery-controls {
+        margin-bottom: 1.2rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+    }
+    .control-btn {
+        background: #7C4585;
+        border-color: #7C4585;
+        color: white;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    .control-btn i {
+        font-size: 1.2rem;
+    }
+    .control-btn:hover {
+        background: #6B3B73;
+        border-color: #6B3B73;
+        color: white;
+        transform: translateY(-2px);
+    }
+    .control-btn.active {
+        background: #3D365C;
+        border-color: #3D365C;
+    }
+    .control-btn[data-bs-toggle="tooltip"] {
+        position: relative;
+    }
+    .photo-grid {
+        margin: 0 auto;
+    }
+    .photo-item {
+        width: 100%;
+        margin: 0 0 20px 0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+        background: #fff;
+    }
+    .photo-item img {
+        width: 100%;
+        height: auto;
+        display: block;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+    .photo-item:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.13);
+    }
+    .photo-item:hover img {
+        transform: scale(1.04);
+    }
+    .photo-grid.grid-mode {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    .photo-grid.grid-mode .photo-item {
+        margin: 0;
+    }
+    @media (max-width: 992px) {
+        .photo-grid.grid-mode {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @media (max-width: 600px) {
+        .cover-container, .photo-main-container {
+            max-width: 100%;
+            padding: 0 0.5rem;
+        }
+        .gallery-header {
+            min-height: 140px;
+            padding: 1.2rem 0.5rem 1rem 0.5rem;
+        }
+        .cover-info {
+            padding: 0.7rem 0.5rem;
+        }
+        .photo-grid.grid-mode {
+            grid-template-columns: 1fr;
+        }
+    }
+    /* 大图模态框样式 */
+    .modal-image {
+        max-width: 100%;
+        max-height: 80vh;
+        margin: 0 auto;
+        display: block;
+        border-radius: 4px;
+    }
+    .modal-footer {
+        justify-content: center;
+        border-top: none;
+        padding: 1rem;
+    }
+    .download-btn {
+        background: #7C4585;
+        border-color: #7C4585;
+        padding: 0.5rem 1.5rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    .download-btn:hover {
+        background: #6B3B73;
+        border-color: #6B3B73;
+        transform: translateY(-2px);
+    }
+    .loading {
+        text-align: center;
+        padding: 20px;
+        display: none;
+    }
+    .loading-spinner {
+        width: 3rem;
+        height: 3rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- 相册头部信息 -->
+<div class="cover-container">
+    <div class="gallery-header">
+        <div class="cover-info">
+            <h1 class="gallery-title">{{ gallery.name }}</h1>
+            <p class="gallery-description">{{ gallery.description }}</p>
+            <p class="gallery-date">{{ gallery.date|date:"Y年m月d日" }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- 照片展示区域 -->
+<div class="photo-main-container">
+    <div class="gallery-controls">
+        <button type="button" class="btn control-btn" id="sortBtn" data-bs-toggle="tooltip" title="从早到晚">
+            <i class="fas fa-sort-amount-down"></i>
+        </button>
+        <button type="button" class="btn control-btn" id="displayBtn" data-bs-toggle="tooltip" title="瀑布流">
+            <i class="fas fa-th-large"></i>
+        </button>
+        <button type="button" class="btn control-btn" id="langBtn" data-bs-toggle="tooltip" title="English">
+            <i class="fas fa-language"></i>
+        </button>
+    </div>
+    <div class="photo-grid" id="photoGrid">
+        <!-- 照片将通过 JavaScript 动态加载 -->
+    </div>
+    <div class="loading" id="loading">
+        <div class="spinner-border loading-spinner text-primary" role="status">
+            <span class="visually-hidden">加载中...</span>
+        </div>
+    </div>
+</div>
+
+<!-- 大图查看模态框 -->
+<div class="modal fade" id="photoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">照片查看</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="" class="modal-image" id="modalImage">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary download-btn" id="downloadBtn">
+                    <i class="fas fa-download"></i> 下载照片
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<!-- 覆盖页脚，移除系统相关信息 -->
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script>
+let page = 1;
+let loading = false;
+let hasMore = true;
+let grid;
+let sortOrder = 'desc'; // 默认从晚到早
+let displayMode = 'masonry'; // 默认瀑布流
+let currentLang = 'zh'; // 默认中文
+
+$(document).ready(function() {
+    // 初始化工具提示
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    // 初始化瀑布流布局
+    initMasonry();
+
+    // 加载初始照片
+    loadPhotos();
+
+    // 监听滚动事件
+    $(window).scroll(function() {
+        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+            if (!loading && hasMore) {
+                loadPhotos();
+            }
+        }
+    });
+
+    // 大图查看
+    $('#photoModal').on('show.bs.modal', function(event) {
+        const button = $(event.relatedTarget);
+        const imageUrl = button.data('image');
+        const downloadUrl = button.data('download');
+        
+        $('#modalImage').attr('src', imageUrl);
+        $('#downloadBtn').attr('href', downloadUrl);
+    });
+
+    // 排序按钮点击事件
+    $('#sortBtn').click(function() {
+        sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
+        $(this).find('i').toggleClass('fa-sort-amount-down fa-sort-amount-up');
+        $(this).attr('title', sortOrder === 'asc' ? '从早到晚' : '从晚到早');
+        resetAndReload();
+    });
+
+    // 显示模式切换
+    $('#displayBtn').click(function() {
+        displayMode = displayMode === 'masonry' ? 'grid' : 'masonry';
+        if (displayMode === 'masonry') {
+            $('#photoGrid').removeClass('grid-mode');
+            initMasonry();
+            $(this).find('i').removeClass('fa-th').addClass('fa-th-large');
+            $(this).attr('title', '瀑布流');
+        } else {
+            $('#photoGrid').addClass('grid-mode');
+            if (grid) {
+                grid.destroy();
+                grid = null;
+            }
+            $(this).find('i').removeClass('fa-th-large').addClass('fa-th');
+            $(this).attr('title', '宫格');
+        }
+        resetAndReload();
+    });
+
+    // 语言切换
+    $('#langBtn').click(function() {
+        currentLang = currentLang === 'zh' ? 'en' : 'zh';
+        updateLanguage();
+    });
+});
+
+function updateLanguage() {
+    // 更新按钮提示文本
+    $('#sortBtn').attr('title', sortOrder === 'asc' ? 
+        (currentLang === 'zh' ? '从早到晚' : 'Oldest First') : 
+        (currentLang === 'zh' ? '从晚到早' : 'Newest First'));
+    
+    $('#displayBtn').attr('title', displayMode === 'masonry' ? 
+        (currentLang === 'zh' ? '瀑布流' : 'Masonry') : 
+        (currentLang === 'zh' ? '宫格' : 'Grid'));
+    
+    $('#langBtn').attr('title', currentLang === 'zh' ? 'English' : '中文');
+    
+    // 更新模态框文本
+    $('.modal-title').text(currentLang === 'zh' ? '照片查看' : 'Photo View');
+    $('#downloadBtn').html(`<i class="fas fa-download"></i> ${currentLang === 'zh' ? '下载照片' : 'Download'}`);
+    
+    // 更新加载提示
+    $('.loading-spinner .visually-hidden').text(currentLang === 'zh' ? '加载中...' : 'Loading...');
+}
+
+function initMasonry() {
+    if (displayMode === 'masonry') {
+        grid = new Masonry('#photoGrid', {
+            itemSelector: '.photo-item',
+            columnWidth: '.photo-item',
+            percentPosition: true,
+            gutter: 20
+        });
+    }
+}
+
+function resetAndReload() {
+    page = 1;
+    hasMore = true;
+    $('#photoGrid').empty();
+    loadPhotos();
+}
+
+function loadPhotos() {
+    if (loading || !hasMore) return;
+    
+    loading = true;
+    $('#loading').show();
+    
+    $.get(`/live_photo/gallery/{{ gallery.name }}/photos/?page=${page}&sort=${sortOrder}`, function(response) {
+        if (response.photos && response.photos.length > 0) {
+            const photos = response.photos;
+            const photoGrid = $('#photoGrid');
+            
+            photos.forEach(photo => {
+                const photoHtml = `
+                    <div class="photo-item">
+                        <img src="${photo.thumbnail_url}" 
+                             data-bs-toggle="modal" 
+                             data-bs-target="#photoModal"
+                             data-image="${photo.image_url}"
+                             data-download="${photo.image_url}"
+                             alt="照片">
+                    </div>
+                `;
+                photoGrid.append(photoHtml);
+            });
+            
+            // 重新布局
+            if (displayMode === 'masonry' && grid) {
+                grid.reloadItems();
+                grid.layout();
+            }
+            
+            page++;
+        } else {
+            hasMore = false;
+        }
+    }).fail(function(error) {
+        console.error('加载照片失败:', error);
+    }).always(function() {
+        loading = false;
+        $('#loading').hide();
+    });
+}
+
+// 下载照片
+$('#downloadBtn').click(function(e) {
+    e.preventDefault();
+    const downloadUrl = $(this).attr('href');
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = downloadUrl.split('/').pop();
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+</script>
+{% endblock %} 
