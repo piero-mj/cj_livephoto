@@ -65,7 +65,7 @@
 <img width="637" alt="image" src="https://github.com/user-attachments/assets/4cd880f8-5628-4041-8105-8825710dd730" />
 
 
-### 管理台（spuperadmin）
+### 管理台（superadmin）
 <img width="1706" alt="image" src="https://github.com/user-attachments/assets/68a4f00d-1e8b-4827-89d9-9832d30a6027" />
 
 
