@@ -9,6 +9,7 @@ env/
 *.sublime-*
 *.swp
 *.swo
+*.code-workspace
 
 # Python Cache
 __pycache__/
